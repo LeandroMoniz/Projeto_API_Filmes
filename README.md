@@ -20,7 +20,9 @@ Inicialização do projeto
 1. Download ou faça um fork do projeto!
 2. Instale Node v18.15.0 
 3. Npm install 
-4. NPM start para iniciar na porta 5000
+4. Install database PostgreSQL , Port: 5432 , Version: 16.1
+5. Create database with dpproject name.
+6. NPM start para iniciar na porta 5000
 
 User story
 ---
