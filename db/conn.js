@@ -6,11 +6,4 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
     port: process.env.DB_PORT,
 });
 
-try {
-    sequelize.authenticate()
-    console.log('Conectamos com sucesso!')
-} catch (err) {
-    console.log(`Não foi possível conectar: ${err}`)
-}
-
 module.exports = sequelize
