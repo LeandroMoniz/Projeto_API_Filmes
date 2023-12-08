@@ -20,7 +20,41 @@ Inicialização do projeto
 1. Download ou faça um fork do projeto!
 2. Instale Node v18.15.0 
 3. Npm install 
-4. NPM start para iniciar na porta 5000
+4. Install database PostgreSQL , Port: 5432 , Version: 16.1
+5. Create database with dpproject name.
+6. create a .env file as shown below
+6. NPM start para iniciar na porta 5000
+
+
+## Arquivo .env
+
+
+```gherkin=
+# DATABASE
+
+DB_HOST=localhost
+DB_USER=postgres
+DB_PASSWORD=123456
+DB_NAME=dpproject
+DB_PORT=5432
+
+# FIRST ADMIN USER 
+FIRST_NAME=admin
+FIRST_EMAIL=admin@admin.com
+FIRST_PASSWORD=123456
+```
+
+![Alt text](image.png)
+
+# Mensagem no console depois de criado o banco e primeiro usuario admin
+```gherkin=
+[nodemon] restarting due to changes...
+[nodemon] starting `node ./index.js localhost 5000`
+Executing (default): SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'Users'Executing (default): SELECT i.relname AS name, ix.indisprimary AS primary, ix.indisunique AS unique, ix.indkey AS indkey, array_agg(a.attnum) as column_indexes, array_agg(a.attname) AS column_names, pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'Users' GROUP BY i.relname, ix.indexrelid, ix.indisprimary, ix.indisunique, ix.indkey ORDER BY i.relname;
+Executing (default): SELECT "id", "name", "email", "password", "isAdmin", "createdAt", "updatedAt" FROM "Users" AS "User" WHERE "User"."isAdmin" = true LIMIT 1;
+O administrador já existe
+O servidor está rodando na porta 5000
+```
 
 User story
 ---
