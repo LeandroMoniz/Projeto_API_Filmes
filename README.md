@@ -15,23 +15,31 @@ Projetos API Filmes
 
 ## Beginners Guide
 
-Inicialização do projeto
 
-1. Download ou faça um fork do projeto!
-2. Instale Node v18.15.0 
-3. Npm install 
+#### Project initialization
+
+1. Download or fork the project!
+2. Install Node v18.15.0. 
+3. Npm install , npm i command to download project dependencies.
 4. Install database PostgreSQL , Port: 5432 , Version: 16.1
-5. Create database with dpproject name.
+5. Create database with "dpproject" name.
 6. create a .env file as shown below
 6. NPM start para iniciar na porta 5000
 
+#### Inicialização do projeto
+1. Baixe ou faça um fork do projeto!
+2. Instale o Node v18.15.0
+3. Instalação npm , comando npm i para baixar dependências do projeto.
+4. Instale o banco de dados PostgreSQL, Porta: 5432, Versão: 16.1
+5. Crie um banco de dados denominado dpproject.
+6. Crie um arquivo .env conforme mostrado abaixo.
+6. O NPM inicia a inicialização na porta 5000
 
 ## Arquivo .env
 
 
 ```gherkin=
 # DATABASE
-
 DB_HOST=localhost
 DB_USER=postgres
 DB_PASSWORD=123456
@@ -46,7 +54,7 @@ FIRST_PASSWORD=123456
 
 ![Alt text](image.png)
 
-# Mensagem no console depois de criado o banco e primeiro usuario admin
+### Mensagem no console depois de criado o banco e primeiro usuario admin
 ```gherkin=
 [nodemon] restarting due to changes...
 [nodemon] starting `node ./index.js localhost 5000`
