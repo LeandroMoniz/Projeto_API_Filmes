@@ -6,11 +6,10 @@ const jwt = require('jsonwebtoken')
 //helpers 
 const createUserToken = require('../helpers/create-user-token')
 const getToken = require('../helpers/get-token')
-
+const getUserByToken = require('../helpers/get-user-by-token')
 module.exports = class UserController {
   static async registerAdmin(req, res) {
     const { name, email, password, confirmPassword } = req.body;
-    console.log("aqui")
 
     // validations
 
@@ -162,7 +161,63 @@ module.exports = class UserController {
     }
   }
 
+  static async editAdmin(req, res) {
+    //check if user exists
+    const token = getToken(req);
+    const user = await getUserByToken(token);
 
+    const { name, email, password, confirmPassword } = req.body;
+
+    //validations
+    if (!name || !email) {
+      res.status(422).json({ message: 'Nome e email são obrigatórios' });
+      return;
+    }
+
+    try {
+      //check if email has already taken
+      const userExists = await User.findOne({ where: { email: email } });
+
+      if (userExists && user.id !== userExists.id) {
+        res.status(422).json({
+          message: 'Por favor, utilize outro e-mail!',
+        })
+        return;
+      }
+
+      user.name = name;
+      user.email = email;
+
+      // Password validation
+      const passwordConform = password.length
+
+      if (passwordConform === 0) {
+        res.status(422).json({ message: 'A senha está vazia , Favor passar a senha!' })
+        return
+      }
+
+      if (password != confirmPassword) {
+        res.status(422).json({ message: 'As senhas não conferem!' })
+        return
+      } else if (password === confirmPassword && password != null) {
+        const salt = await bcrypt.genSalt(12)
+        const passwordHash = await bcrypt.hash(password, salt)
+
+        user.password = passwordHash
+      }
+
+      // Saves changes to the database
+      await user.save();
+
+      res.status(200).json({
+        message: 'Usuário atualizado com sucesso!',
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar usuário:', error);
+      res.status(500).json({ message: 'Erro interno do servidor' });
+
+    }
+  }
 
 
 
