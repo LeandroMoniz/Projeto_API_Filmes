@@ -51,10 +51,22 @@ FIRST_NAME=admin
 FIRST_EMAIL=admin@admin.com
 FIRST_PASSWORD=123456
 ```
-
+### Banco de dados com primeiro usuário criado.
 ![Alt text](image.png)
 
-### Mensagem no console depois de criado o banco e primeiro usuario admin
+### Criação de primeiro usuário ADMIN pelo sistema.
+
+```gherkin=
+Recurso: Criação do primeiro usuário administrador
+     Regra: Cadastro de administrador do sistema, só pode ser feito por admin.
+     Portanto o sistema tem que criar um usuário padrão pela primeira vez no banco antes de ter outros usuários administradores.
+  
+
+     Cenário: Sistema cria usuário padrão
+       permitindo a criação de mais usuários
+```
+
+### Mensagem no console depois de criado o banco e primeiro usuário admin
 ```gherkin=
 [nodemon] restarting due to changes...
 [nodemon] starting `node ./index.js localhost 5000`
@@ -104,11 +116,10 @@ Feature: Shopping Cart
 User flows
 ---
 ```sequence
-Alice->Bob: Hello Bob, how are you?
-Note right of Bob: Bob thinks
-Bob-->Alice: I am good thanks!
-Note left of Alice: Alice responds
-Alice->Bob: Where have you been?
+Postman->Sistema: Requisição POST em json
+Note right of Sistema: Sistema thinks
+Sistema-->Postman: Retorna !
+Note left of Postman: Postman responds
 ```
 
 > Read more about sequence-diagrams here: http://bramp.github.io/js-sequence-diagrams/
@@ -117,14 +128,18 @@ Project Timeline
 ---
 ```mermaid
 gantt
-    title A Gantt Diagram
+    title Projeto Filme teste
 
     section Section
-    A task           :a1, 2014-01-01, 30d
-    Another task     :after a1  , 20d
-    section Another
-    Task in sec      :2014-01-12  , 12d
-    anther task      : 24d
+    start project          :a1, 2023-12-06, 1h
+    Criação de pastas     :after a1  , 3h
+    criação database    :a2, 2023-12-07  , 4h
+    Criação arquivo env. :after a2  , 2h
+    Criação primeiro Usuario : a3, 2023-12-08 , 3h
+    Colocado Eslint no projeto :  after a3, 1h
+    Colocado prettier : after a3, 1h
+    Criação rota de cadastro de usuário : after a3, 2h
+    Criação de token : after a3 , 2h
 ```
 
 > Read more about mermaid here: http://mermaid-js.github.io/mermaid/
