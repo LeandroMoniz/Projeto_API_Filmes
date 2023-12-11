@@ -1,11 +1,11 @@
 const User = require('../models/user');
 
 const bcrypt = require('bcrypt')
-//const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken')
 
 //helpers 
 const createUserToken = require('../helpers/create-user-token')
-
+const getToken = require('../helpers/get-token')
 
 module.exports = class UserController {
   static async registerAdmin(req, res) {
@@ -112,4 +112,61 @@ module.exports = class UserController {
 
     await createUserToken(user, req, res)  //login
   }
+
+  static async checkUser(req, res) {
+    let currentUser
+
+
+    if (req.headers.authorization) {
+      const token = getToken(req)
+      try {
+        const decoded = jwt.verify(token, process.env.SECRET);
+
+        currentUser = await User.findByPk(decoded.id);
+
+        if (currentUser) {
+          currentUser.password = undefined;
+        }
+      } catch (error) {
+        console.error('Erro ao verificar token:', error);
+        currentUser = null;
+      }
+    } else {
+      currentUser = null
+    }
+
+    res.status(200).send(currentUser)
+  }
+
+  static async getUserById(req, res) {
+    const id = req.params.id
+
+    try {
+      const user = await User.findByPk(id, {
+        attributes: { exclude: ['password'] },
+      });
+
+      if (!user) {
+        res.status(422).json({
+          message: 'Usuário não encontrado!',
+        });
+        return;
+      }
+
+      res.status(200).json({ user });
+    } catch (error) {
+      console.error('Erro ao buscar usuário por ID:', error);
+      res.status(500).json({
+        message: 'Erro interno do servidor',
+      });
+    }
+  }
+
+
+
+
+
+
+
+
 };
