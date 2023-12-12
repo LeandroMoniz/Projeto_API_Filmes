@@ -13,6 +13,17 @@ module.exports = class UserController {
 
     // validations
 
+    const token = getToken(req);
+    const user = await getUserByToken(token);
+
+    if (user.isAdmin == false) {
+      res.status(422).json({
+        message: 'Usuário não autorizador !',
+      })
+      return
+    }
+
+
     const errorMessages = {
       name: 'O nome é obrigatório',
       email: 'O email é obrigatório',
@@ -51,7 +62,6 @@ module.exports = class UserController {
 
     // check if user exists
     const userExists = await User.findOne({ where: { email: email } });
-    console.log(userExists)
 
     if (userExists) {
       res.status(422).json({
@@ -161,7 +171,7 @@ module.exports = class UserController {
     }
   }
 
-  static async editAdmin(req, res) {
+  static async editUsers(req, res) {
     //check if user exists
     const token = getToken(req);
     const user = await getUserByToken(token);
@@ -189,11 +199,9 @@ module.exports = class UserController {
       user.email = email;
 
       // Password validation
-      const passwordConform = password.length
-
-      if (passwordConform === 0) {
-        res.status(422).json({ message: 'A senha está vazia , Favor passar a senha!' })
-        return
+      if (password.length < 6) {
+        sendErrorResponse('A senha deve ter no mínimo 6 caracteres.');
+        return;
       }
 
       if (password != confirmPassword) {
@@ -219,9 +227,125 @@ module.exports = class UserController {
     }
   }
 
+  static async registerUsers(req, res) {
+    const { name, email, password, confirmPassword } = req.body;
+
+    // validations
+
+    const errorMessages = {
+      name: 'O nome é obrigatório',
+      email: 'O email é obrigatório',
+      password: 'A senha é obrigatória',
+      confirmPassword: 'A confirmação de senha é obrigatória',
+      passwordMatch: 'A senha e a confirmação de senha não são iguais!',
+    };
+
+    const sendErrorResponse = (message) => {
+      res.status(422).json({ message });
+    };
+
+    const validations = {
+      name,
+      email,
+      password,
+      confirmPassword,
+    };
+
+    for (const field in validations) {
+      if (!validations[field]) {
+        sendErrorResponse(errorMessages[field]);
+        return;
+      }
+    }
+
+    if (password.length < 6) {
+      sendErrorResponse('A senha deve ter no mínimo 6 caracteres.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      sendErrorResponse(errorMessages.passwordMatch);
+      return;
+    }
+
+    // check if user exists
+    const userExists = await User.findOne({ where: { email: email } });
+
+    if (userExists) {
+      res.status(422).json({
+        message: 'Por favor, utilize outro e-mail',
+      });
+      return;
+    }
+
+    const isAdmin = false;
+
+    // create a password
+    const salt = await bcrypt.genSalt(12)
+    const passwordHash = await bcrypt.hash(password, salt)
 
 
+    try {
+      const user = await User.create({ name, email, password: passwordHash, isAdmin });
+      await createUserToken(user, req, res);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
 
+  static async deleteUsers(req, res) {
+    // validação para ver se admin
+    const token = getToken(req);
+    const user = await getUserByToken(token);
 
+    if (user.isAdmin == false) {
+      res.status(422).json({
+        message: 'Usuário não autorizador !',
+      })
+      return
+    }
+
+    const { name, email } = req.body;
+
+    //validations
+    if (!name || !email) {
+      res.status(422).json({ message: 'Nome e email são obrigatórios' });
+      return;
+    }
+
+    const userExists = await User.findOne({ where: { email: email } });
+    console.log(name)
+
+    if (userExists == undefined) {
+      res.status(422).json({
+        message: 'Por favor, utilize outro e-mail!',
+      })
+      return;
+    }
+
+    if (userExists.name != name) {
+      res.status(422).json({
+        message: 'Por favor, verifique o nome a ser removido!',
+      })
+      return;
+    }
+
+    try {
+      // Excluir o usuário
+      await User.destroy({ where: { email } });
+
+      res.status(200).json({
+        message: 'Usuário removido com sucesso!',
+      });
+
+    } catch (error) {
+      console.error('Erro ao excluir usuário:', error);
+      res.status(500).json({
+        message: 'Erro interno do servidor ao excluir usuário',
+      });
+    }
+
+  }
 
 };
