@@ -50,6 +50,9 @@ DB_PORT=5432
 FIRST_NAME=admin
 FIRST_EMAIL=admin@admin.com
 FIRST_PASSWORD=123456
+
+#create user token
+SECRET=asder145@45%67
 ```
 ### Banco de dados com primeiro usuário criado.
 ![Alt text](image.png)
@@ -75,6 +78,37 @@ Executing (default): SELECT "id", "name", "email", "password", "isAdmin", "creat
 O administrador já existe
 O servidor está rodando na porta 5000
 ```
+
+### Criação de usuário administrador.
+
+```gherkin=
+Feature: Criação de usuário administrador 
+
+  # Usuário Administrador 
+  Regras : Um usuário administrador só pode ser criado por outro ADMIN.
+
+  Cenário: Não passa o nome 
+  Envia um mensagem de falha
+   - Não é passado o email 
+   Envia mensagem de falha 
+   - Email igual de outra usuário !
+   Envia mensagem para mudar 
+   - Senha em vazio 
+   Mensagem de Erro 
+   - Senha diferentes 
+   Mensagem de Erro 
+
+   Quando tiver passado Nome , Email e senha corretos e validados 
+   Criar novo Admin 
+   Passar token e userid .
+   isAdmin : true para front end 
+
+
+```
+
+#### Print do postman de register Admin
+
+![Alt text](image-1.png)
 
 User story
 ---
@@ -135,11 +169,15 @@ gantt
     Criação de pastas     :after a1  , 3h
     criação database    :a2, 2023-12-07  , 4h
     Criação arquivo env. :after a2  , 2h
-    Criação primeiro Usuario : a3, 2023-12-08 , 3h
+    Criação primeiro Usuário : a3, 2023-12-08 , 3h
     Colocado Eslint no projeto :  after a3, 1h
     Colocado prettier : after a3, 1h
     Criação rota de cadastro de usuário : after a3, 2h
     Criação de token : after a3 , 2h
+    Criação do verificar token : a4 ,2023-12-10 , 1h
+    Criação do roda get id e documentos : after a4 , 2h
+    Criação da Edição admin : a5, 2023-12-11 , 2h
+    Acertando documentação : after a5 , 1h
 ```
 
 > Read more about mermaid here: http://mermaid-js.github.io/mermaid/
