@@ -14,9 +14,11 @@ router.delete('/removeUsers', verifyToken, UserController.deleteUsers)
 // Common Admin e Users
 router.patch('/edit', verifyToken, UserController.editUsers)
 router.get('/:id', verifyToken, UserController.getUserById)
+router.patch('/deactivation', verifyToken, UserController.deactivation)
 
 // Users 
 router.post('/register', UserController.registerUsers)
+
 
 
 

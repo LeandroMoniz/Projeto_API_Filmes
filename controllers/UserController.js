@@ -23,7 +23,6 @@ module.exports = class UserController {
       return
     }
 
-
     const errorMessages = {
       name: 'O nome é obrigatório',
       email: 'O email é obrigatório',
@@ -62,28 +61,55 @@ module.exports = class UserController {
 
     // check if user exists
     const userExists = await User.findOne({ where: { email: email } });
-
-    if (userExists) {
-      res.status(422).json({
-        message: 'Por favor, utilize outro e-mail',
-      });
-      return;
-    }
-
     const isAdmin = true;
+    const bit = true;
 
     // create a password
     const salt = await bcrypt.genSalt(12)
     const passwordHash = await bcrypt.hash(password, salt)
 
+    if (userExists) {
+      if (userExists.bit == false) {
+        try {
+          await User.update(
+            {
+              password: passwordHash,
+              bit: true,
+              email,
+              name
+            },
+            {
+              where: { id: userExists.id }
+            }
+          );
+          res.status(422).json({
+            message: 'Cadastro reativado, atualizado dados e senha !',
+          });
+          return;
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'Internal Server Error' });
+        }
+      } else {
+        res.status(422).json({
+          message: 'Por favor, utilize outro e-mail',
+        });
+        return;
+      }
 
-    try {
-      const user = await User.create({ name, email, password: passwordHash, isAdmin });
-      await createUserToken(user, req, res);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      try {
+        const user = await User.create({ name, email, password: passwordHash, isAdmin, bit });
+        await createUserToken(user, req, res);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+
     }
+
+
+
   }
 
   static async login(req, res) {
@@ -105,6 +131,13 @@ module.exports = class UserController {
     if (!user) {
       res.status(422).json({
         message: 'Não há usuário cadastrado com este e-mail!',
+      })
+      return
+    }
+
+    if (user.bit == false) {
+      res.status(422).json({
+        message: 'Usuário desativado, fazer novo cadastro!',
       })
       return
     }
@@ -271,26 +304,50 @@ module.exports = class UserController {
     // check if user exists
     const userExists = await User.findOne({ where: { email: email } });
 
-    if (userExists) {
-      res.status(422).json({
-        message: 'Por favor, utilize outro e-mail',
-      });
-      return;
-    }
-
     const isAdmin = false;
+    const bit = true;
 
     // create a password
     const salt = await bcrypt.genSalt(12)
     const passwordHash = await bcrypt.hash(password, salt)
 
-
-    try {
-      const user = await User.create({ name, email, password: passwordHash, isAdmin });
-      await createUserToken(user, req, res);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    if (userExists) {
+      if (userExists.bit == false) {
+        try {
+          await User.update(
+            {
+              password: passwordHash,
+              bit: true,
+              email,
+              isAdmin: false,
+              name
+            },
+            {
+              where: { id: userExists.id }
+            }
+          );
+          res.status(422).json({
+            message: 'Cadastro reativado, atualizado dados e senha !',
+          });
+          return;
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'Internal Server Error' });
+        }
+      } else {
+        res.status(422).json({
+          message: 'Por favor, utilize outro e-mail',
+        });
+        return;
+      }
+    } else {
+      try {
+        const user = await User.create({ name, email, password: passwordHash, isAdmin, bit });
+        await createUserToken(user, req, res);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
     }
   }
 
@@ -315,7 +372,6 @@ module.exports = class UserController {
     }
 
     const userExists = await User.findOne({ where: { email: email } });
-    console.log(name)
 
     if (userExists == undefined) {
       res.status(422).json({
@@ -345,6 +401,20 @@ module.exports = class UserController {
         message: 'Erro interno do servidor ao excluir usuário',
       });
     }
+
+  }
+
+  static async deactivation(req, res) {
+
+    const token = getToken(req);
+    const user = await getUserByToken(token);
+    //change of status
+    user.bit = false
+    //save database
+    await user.save()
+    res.status(200).json({
+      message: 'Usuário atualizado com sucesso!',
+    });
 
   }
 
