@@ -5,6 +5,7 @@ const cors = require('cors');
 const conn = require('./db/conn');
 const bcrypt = require('bcrypt');
 const User = require('./models/user');
+const Log = require('./models/log')
 
 const app = express();
 // Config JSON response
@@ -27,6 +28,7 @@ const createFirstAdmin = async () => {
                 email: process.env.FIRST_EMAIL,
                 password: hashedPassword,
                 isAdmin: true,
+                bit: true,
             });
             console.log('Primeiro administrador criado com sucesso');
         } else {
@@ -45,6 +47,7 @@ app.use('/users', UserRoutes);
 
 conn
     .sync()
+    //.sync({ force: true })
     .then(async () => {
         // Função para criar o primeiro administrador se não existir
         await createFirstAdmin();

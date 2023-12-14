@@ -21,6 +21,10 @@ const User = sequelize.define('User', {
     type: DataTypes.BOOLEAN,
     require: true,
   },
+
+  bit: {
+    type: DataTypes.BOOLEAN,
+  }
 });
 
 module.exports = User;
