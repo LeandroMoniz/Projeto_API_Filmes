@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Log = require('../models/log');
 
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
@@ -387,7 +388,16 @@ module.exports = class UserController {
       return;
     }
 
+
     try {
+      // Gravação em Log 
+      await Log.create({
+        idAdmin: user.id,
+        deleteName: userExists.name,
+        deleteEmail: userExists.email,
+        deleteIsAdmin: userExists.isAdmin
+      });
+
       // Excluir o usuário
       await User.destroy({ where: { email } });
 

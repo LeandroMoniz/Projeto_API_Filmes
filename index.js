@@ -5,6 +5,7 @@ const cors = require('cors');
 const conn = require('./db/conn');
 const bcrypt = require('bcrypt');
 const User = require('./models/user');
+const Log = require('./models/log')
 
 const app = express();
 // Config JSON response
