@@ -40,8 +40,10 @@ const createFirstAdmin = async () => {
 
 // Routes
 const UserRoutes = require('./routes/UserRoutes');
+const MovieRoutes = require('./routes/MovieRoutes');
 
 app.use('/users', UserRoutes);
+app.use('/movie', MovieRoutes);
 
 
 conn

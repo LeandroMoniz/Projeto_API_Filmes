@@ -19,7 +19,4 @@ router.patch('/deactivation', verifyToken, UserController.deactivation);
 // Users 
 router.post('/register', UserController.registerUsers);
 
-
-
-
 module.exports = router;
