@@ -16,7 +16,7 @@ const errorMessages = {
   checkRemove: 'Por favor, verifique o nome a ser removido!',
   userUpdate: 'Usuário atualizado com sucesso!',
   userRemove: 'Usuário removido com sucesso!',
-  erroBusca: 'Não sou passado parâmetro para busca!',
+  erroBusca: 'Não foi passado parâmetro obrigatório!',
 };
 
 module.exports = errorMessages;

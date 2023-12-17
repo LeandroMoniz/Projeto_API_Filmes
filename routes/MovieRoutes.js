@@ -7,6 +7,7 @@ const MovieReviewController = require('../controllers/MovieReviewController');
 //Movies
 
 router.get('/movies', verifyToken, MovieReviewController.getMovie);
+router.get('/moviesById', verifyToken, MovieReviewController.getByIdMovie);
 
 
 module.exports = router;
