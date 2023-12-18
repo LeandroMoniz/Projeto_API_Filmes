@@ -10,10 +10,11 @@ router.post('/registerAdmin', verifyToken, UserController.registerAdmin);
 router.post('/login', UserController.login);
 router.get('/checkUser', UserController.checkUser);
 router.delete('/removeUsers', verifyToken, UserController.deleteUsers);
+router.get('/allUser', verifyToken, UserController.getUserDb);
 
 // Common Admin e Users
 router.patch('/edit', verifyToken, UserController.editUsers);
-router.get('/:id', verifyToken, UserController.getUserById);
+router.get('/UserById', verifyToken, UserController.getUserById);
 router.patch('/deactivation', verifyToken, UserController.deactivation);
 
 // Users 

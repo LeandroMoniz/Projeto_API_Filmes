@@ -4,9 +4,11 @@ const express = require('express');
 const cors = require('cors');
 const conn = require('./db/conn');
 const bcrypt = require('bcrypt');
+//models
 const User = require('./models/user');
 const Log = require('./models/log');
 const Movie = require('./models/movie');
+const Vote = require('./models/vote');
 
 const app = express();
 // Config JSON response
@@ -48,7 +50,8 @@ app.use('/users', UserRoutes);
 app.use('/movie', MovieRoutes);
 
 
-conn.sync()
+conn
+  .sync()
   //.sync({ force: true })
   .then(async () => {
     // Função para criar o primeiro administrador se não existir

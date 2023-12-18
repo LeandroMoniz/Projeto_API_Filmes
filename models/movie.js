@@ -42,6 +42,11 @@ const Movie = sequelize.define('Movie', {
         require: true,
     },
 
+    bit: {
+        type: DataTypes.BOOLEAN,
+        require: true,
+    },
+
 });
 
 module.exports = Movie

@@ -17,7 +17,12 @@ const errorMessages = {
   userUpdate: 'Usuário atualizado com sucesso!',
   userRemove: 'Usuário removido com sucesso!',
   erroBusca: 'Não foi passado parâmetro obrigatório!',
-  movieExist: ' Filme já cadastrado ! '
+  movieExist: ' Filme já cadastrado ! ',
+  MovieRemove: 'Filme desativado!',
+  voteError: 'A nota deve estar no intervalo de 0 a 4 !',
+  movieNot: 'Filme não encontrado ! ',
+  voteCreate: 'Seu voto foi computado, Parabéns !',
+  voteOne: 'Só pode votar uma vez por Filme!',
 };
 
 module.exports = errorMessages;

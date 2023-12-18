@@ -1,11 +1,13 @@
 const axios = require('axios');
 //models
 const Movie = require('../models/movie');
+const Vote = require('../models/vote');
 //helpers
 const errorMessages = require('../public/errorMessages/errorMessages');
 const sendErrorResponse = require('../helpers/sendErrorResponse');
 const getToken = require('../helpers/get-token');
 const getUserByToken = require('../helpers/get-user-by-token');
+const averageMovies = require('../helpers/averageMovie');
 const apiKey = process.env.YOUR_API_KEY;
 
 module.exports = class MovieReviewController {
@@ -120,6 +122,7 @@ module.exports = class MovieReviewController {
                     Poster: movies.Poster,
                     Plot: movies.Plot,
                     IdUser: user.id,
+                    bit: true,
                 }
 
                 const createMovies = await Movie.create(dbMovies);
@@ -139,7 +142,9 @@ module.exports = class MovieReviewController {
     static async getMovieDb(req, res) {
         try {
             const movieAll = await Movie.findAll({
+                where: { bit: true },
                 attributes: [
+                    'id',
                     'Title',
                     'IdMovie',
                     'Runtime',
@@ -148,14 +153,86 @@ module.exports = class MovieReviewController {
                     'Actors',
                     'Poster',
                     'Plot',
-                ]
+                ],
             });
-            res.status(200).json({ movieAll });
+
+            const moviesWithAverage = await Promise.all(movieAll.map(async (movie) => {
+                const averageNote = await averageMovies(movie.id);
+
+                return {
+                    ...movie.toJSON(),
+                    AverageNote: averageNote,
+                };
+            }));
+
+            res.status(200).json({ movieWithAverage: moviesWithAverage });
         } catch (error) {
             res.status(500).json({
                 message: 'Erro interno do servidor',
             });
         }
+    }
+
+
+    static async getByIdMovieDB(req, res) {
+        try {
+            const id = req.query.id
+            const movie = await Movie.findByPk(id)
+
+            if (movie == null || movie.bit == false) {
+                sendErrorResponse.fourTwoTwo(errorMessages.movieNot, res);
+                return;
+            } else {
+                const nota = await averageMovies(movie.id);
+
+                const byMovie = {
+                    Title: movie.Title,
+                    id: movie.id,
+                    IdMovie: movie.IdMovie,
+                    Runtime: movie.Runtime,
+                    Genre: movie.Genre,
+                    Director: movie.Director,
+                    Actors: movie.Actors,
+                    Poster: movie.Poster,
+                    Plot: movie.Plot,
+                    AverageNote: nota.AverageNote,
+                    VotesAmount: nota.votes,
+                }
+
+                res.status(200).json({ byMovie });
+                return;
+            }
+
+
+        } catch (error) {
+            res.status(500).json({
+                message: 'Erro interno do servidor',
+            });
+        }
+    }
+
+    static async desativeMovie(req, res) {
+        const token = getToken(req);
+        const user = await getUserByToken(token);
+
+        if (user == null) {
+            sendErrorResponse.fourTwoTwo(errorMessages.userNotAut, res);
+            return;
+        }
+
+        if (user.isAdmin == false) {
+            sendErrorResponse.fourTwoTwo(errorMessages.userNotAut, res);
+            return;
+        }
+
+        const idMovie = req.query.idMovie;
+        const bit = false
+
+        await Movie.update({ bit: bit, IdUser: user.id }, { where: { IdMovie: idMovie } });
+
+        sendErrorResponse.twoZero(errorMessages.MovieRemove, res);
+        return;
+
     }
 
 

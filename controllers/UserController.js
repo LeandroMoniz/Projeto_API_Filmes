@@ -9,6 +9,7 @@ const createUserToken = require('../helpers/create-user-token');
 const getToken = require('../helpers/get-token');
 const getUserByToken = require('../helpers/get-user-by-token');
 const sendErrorResponse = require('../helpers/sendErrorResponse');
+const averageUser = require('../helpers/averageUser');
 //errorMessages
 const errorMessages = require('../public/errorMessages/errorMessages');
 module.exports = class UserController {
@@ -19,6 +20,11 @@ module.exports = class UserController {
 
     const token = getToken(req);
     const user = await getUserByToken(token);
+
+    if (user == null) {
+      sendErrorResponse.fourTwoTwo(errorMessages.userNotAut, res);
+      return;
+    }
 
     if (user.isAdmin == false) {
       sendErrorResponse.fourTwoTwo(errorMessages.userNotAut, res);
@@ -118,7 +124,6 @@ module.exports = class UserController {
       sendErrorResponse.fourTwoTwo(errorMessages.existingEmail, res);
       return;
     }
-    console.log('aqui');
     if (user.bit == false) {
       sendErrorResponse.fourTwoTwo(errorMessages.desativeUser, res);
       return;
@@ -161,9 +166,12 @@ module.exports = class UserController {
   }
 
   static async getUserById(req, res) {
-    const id = req.params.id;
 
     try {
+      const token = getToken(req);
+      const idUser = await getUserByToken(token);
+      const id = idUser.id
+
       const user = await User.findByPk(id, {
         attributes: { exclude: ['password'] },
       });
@@ -171,8 +179,9 @@ module.exports = class UserController {
       if (!user) {
         sendErrorResponse.fourTwoTwo(errorMessages.notFound, res);
       }
+      const nota = await averageUser(id);
 
-      res.status(200).json({ user });
+      res.status(200).json({ user, nota });
     } catch (error) {
       console.error('Erro ao buscar usuário por ID:', error);
       res.status(500).json({
@@ -367,6 +376,35 @@ module.exports = class UserController {
     //save database
     await user.save();
     sendErrorResponse.twoZero(errorMessages.userUpdate, res);
+  }
+
+  static async getUserDb(req, res) {
+    try {
+      const UserAll = await User.findAll({
+        where: { bit: true },
+        attributes: [
+          'id',
+          'name',
+          'isAdmin',
+          'email',
+        ],
+      });
+
+      const userWithAverage = await Promise.all(UserAll.map(async (user) => {
+        const averageNote = await averageUser(user.id);
+
+        return {
+          ...user.toJSON(),
+          AverageNote: averageNote,
+        };
+      }));
+
+      res.status(200).json({ userWithAverage: userWithAverage });
+    } catch (error) {
+      res.status(500).json({
+        message: 'Erro interno do servidor',
+      });
+    }
   }
 
 };
