@@ -36,7 +36,6 @@ module.exports = class VoteController {
                 where: { UserId: IdUser, MovieId: IdMovie }
             })
             if (oneVote) {
-                console.log("voto", oneVote)
                 sendErrorResponse.fourTwoTwo(errorMessages.voteOne, res);
                 return;
             } else {

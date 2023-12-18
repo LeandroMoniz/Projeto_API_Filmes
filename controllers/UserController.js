@@ -123,7 +123,6 @@ module.exports = class UserController {
       sendErrorResponse.fourTwoTwo(errorMessages.existingEmail, res);
       return;
     }
-    console.log('aqui');
     if (user.bit == false) {
       sendErrorResponse.fourTwoTwo(errorMessages.desativeUser, res);
       return;

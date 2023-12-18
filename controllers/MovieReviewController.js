@@ -1,11 +1,13 @@
 const axios = require('axios');
 //models
 const Movie = require('../models/movie');
+const Vote = require('../models/vote');
 //helpers
 const errorMessages = require('../public/errorMessages/errorMessages');
 const sendErrorResponse = require('../helpers/sendErrorResponse');
 const getToken = require('../helpers/get-token');
 const getUserByToken = require('../helpers/get-user-by-token');
+const averageMovies = require('../helpers/averageMovie');
 const apiKey = process.env.YOUR_API_KEY;
 
 module.exports = class MovieReviewController {
@@ -152,9 +154,21 @@ module.exports = class MovieReviewController {
                     'Poster',
                     'Plot',
                 ],
-
             });
-            res.status(200).json({ movieAll });
+
+            const moviesWithAverage = await Promise.all(movieAll.map(async (movie) => {
+                const votes = await Vote.findAll({
+                    where: { MovieId: movie.id },
+                });
+                const averageNote = await averageMovies(movie.id);
+
+                return {
+                    ...movie.toJSON(),
+                    AverageNote: averageNote,
+                };
+            }));
+
+            res.status(200).json({ movieWithAverage: moviesWithAverage });
         } catch (error) {
             res.status(500).json({
                 message: 'Erro interno do servidor',
@@ -172,6 +186,8 @@ module.exports = class MovieReviewController {
                 sendErrorResponse.fourTwoTwo(errorMessages.movieNot, res);
                 return;
             } else {
+                const nota = await averageMovies(movie.id);
+
                 const byMovie = {
                     Title: movie.Title,
                     id: movie.id,
@@ -182,6 +198,8 @@ module.exports = class MovieReviewController {
                     Actors: movie.Actors,
                     Poster: movie.Poster,
                     Plot: movie.Plot,
+                    AverageNote: nota.AverageNote,
+                    VotesAmount: nota.votes,
                 }
 
                 res.status(200).json({ byMovie });
@@ -212,7 +230,6 @@ module.exports = class MovieReviewController {
 
         const idMovie = req.query.idMovie;
         const bit = false
-        console.log("id", user.id)
 
         await Movie.update({ bit: bit, IdUser: user.id }, { where: { IdMovie: idMovie } });
 
