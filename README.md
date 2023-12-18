@@ -53,23 +53,26 @@ FIRST_PASSWORD=123456
 
 #create user token
 SECRET=asder145@45%67
+
+#API
+YOUR_API_KEY= "Criar Conta no OMDB"
 ```
-### Banco de dados com primeiro usuário criado.
-![Alt text](image.png)
+
+
 
 ### Criação de primeiro usuário ADMIN pelo sistema.
+#### Regra
 
 ```gherkin=
 Recurso: Criação do primeiro usuário administrador
      Regra: Cadastro de administrador do sistema, só pode ser feito por admin.
      Portanto o sistema tem que criar um usuário padrão pela primeira vez no banco antes de ter outros usuários administradores.
   
-
      Cenário: Sistema cria usuário padrão
        permitindo a criação de mais usuários
 ```
 
-### Mensagem no console depois de criado o banco e primeiro usuário admin
+#### Mensagem no console depois de criado o banco e primeiro usuário admin
 ```gherkin=
 [nodemon] restarting due to changes...
 [nodemon] starting `node ./index.js localhost 5000`
@@ -79,11 +82,42 @@ O administrador já existe
 O servidor está rodando na porta 5000
 ```
 
-### Criação de usuário administrador.
+#### Falhas 
+```gherkin=
+ - Caso senha errada no login 
+ Mensagem : {
+    "message": "Senha inválida!"
+}
+ - Caso Email errado no login 
+{
+    "message": "Não há usuário cadastrado com este e-mail!"
+}
+
+```
+
+#### Login com sucesso .
+```gherkin=
+- Roda : http://localhost:5000/users/login
+Body Json : {
+    "email": "admin@admin.com",
+    "password": "123456"
+
+}
+return :
+{
+    "message": "Você está autenticado",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4iLCJpZCI6MSwiaWF0IjoxNzAyOTM2MzkxfQ.5TS1jrpPlQtwReqF40io2kmrIlEmanmTIHJJk9ZDUZY",
+    "userId": 1,
+    "isAdmin": true
+}
+
+```
+
+
+### Criação do Segundo usuário Administrador
 
 ```gherkin=
-Feature: Criação de usuário administrador 
-
+Feature: Criação User Admin
   # Usuário Administrador 
   Regras : Um usuário administrador só pode ser criado por outro ADMIN.
 
@@ -100,52 +134,79 @@ Feature: Criação de usuário administrador
 
    Quando tiver passado Nome , Email e senha corretos e validados 
    Criar novo Admin 
-   Passar token e userid .
+   Passar token e userId .
    isAdmin : true para front end 
-
-
 ```
 
-#### Print do postman de register Admin
-
-![Alt text](image-1.png)
-
-User story
----
+#### cadastro
 
 ```gherkin=
-Feature: Guess the word
+  Rota :  http://localhost:5000/users/registerAdmin
 
-  # The first example has two steps
-  Scenario: Maker starts a game
-    When the Maker starts a game
-    Then the Maker waits for a Breaker to join
+  Body Json :
+  {
+    "name": "Carlos",
+    "email": "Carlos@gmail.com",
+    "password": "101010",
+    "confirmPassword": "101010"
 
-  # The second example has three steps
-  Scenario: Breaker joins a game
-    Given the Maker has started a game with the word "silky"
-    When the Breaker joins the Maker's game
-    Then the Breaker must guess a word with 5 characters
+  }
+  Return :
+  {
+    "message": "Você está autenticado",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQ2FybG9zIiwiaWQiOjIsImlhdCI6MTcwMjkzNjY0N30.svDoeDdkZg-axRTLFTnZW19hRm5wgq6IxxFeUjny2HQ",
+    "userId": 2,
+    "isAdmin": true
+}
 ```
-> I choose a lazy person to do a hard job. Because a lazy person will find an easy way to do it. [name=Bill Gates]
-
+### Deletar do banco de dados user 
 
 ```gherkin=
-Feature: Shopping Cart
-  As a Shopper
-  I want to put items in my shopping cart
-  Because I want to manage items before I check out
+Feature: Deletar User Admin
+  # Usuário Administrador 
+  Regras : Um usuário só pode ser deletado por outro administrador.
 
-  Scenario: User adds item to cart
-    Given I'm a logged-in User
-    When I go to the Item page
-    And I click "Add item to cart"
-    Then the quantity of items in my cart should go up
-    And my subtotal should increment
-    And the warehouse inventory should decrement
+  Cenário: Não passa o nome 
+  Envia um mensagem de falha
+   - Não é passado o email 
+   Envia mensagem de falha 
+   - Email igual de outra usuário !
+   Envia mensagem para mudar 
+   - Senha em vazio 
+   Mensagem de Erro 
+   - Senha diferentes 
+   Mensagem de Erro 
 ```
+#### Resposta caso tiver errado . 
 
-> Read more about Gherkin here: https://docs.cucumber.io/gherkin/reference/
+```gherkin=
+Roda :  users/removeUsers
+{
+    "name": "admi",
+    "email": "admin@admin.com"
+} 
+Retorna : 422
+{
+    "message": "Por favor, verifique o nome a ser removido!"
+}
+
+Email erro o retorno : 
+{
+    "message": "Por favor, utilize outro e-mail!"
+}
+
+Caso em passado dados corretos o retorno : 
+{
+    "message": "Usuário removido com sucesso!"
+}
+e o Usuário e excluído do banco de dados.
+```
+#### Logs
+
+Por segurança depois a exclusão as informações de qual admin exclui e email e nome do user excluído vão tabela de logs.
+
+![Alt text](public/Readme_files/image.png)
+
 
 User flows
 ---
