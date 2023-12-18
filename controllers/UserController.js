@@ -170,7 +170,7 @@ module.exports = class UserController {
     try {
       const token = getToken(req);
       const idUser = await getUserByToken(token);
-      const id = idUser.id
+      const id = idUser.id;
 
       const user = await User.findByPk(id, {
         attributes: { exclude: ['password'] },
