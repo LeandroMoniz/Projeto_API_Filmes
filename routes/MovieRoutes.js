@@ -3,7 +3,7 @@ const router = require('express').Router();
 const verifyToken = require('../helpers/verify-token');
 
 const MovieReviewController = require('../controllers/MovieReviewController');
-
+const VoteController = require('../controllers/VoteController');
 //Movies
 
 router.get('/movies', verifyToken, MovieReviewController.getMovie);
@@ -12,5 +12,7 @@ router.post('/create', verifyToken, MovieReviewController.createMovie);
 router.get('/movieAll', MovieReviewController.getMovieDb);
 router.patch('/deactivation', verifyToken, MovieReviewController.desativeMovie);
 
+//vote
+router.post('/createVote', verifyToken, VoteController.createVote);
 
 module.exports = router;
