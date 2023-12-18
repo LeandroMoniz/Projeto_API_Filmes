@@ -136,6 +136,28 @@ module.exports = class MovieReviewController {
 
     }
 
+    static async getMovieDb(req, res) {
+        try {
+            const movieAll = await Movie.findAll({
+                attributes: [
+                    'Title',
+                    'IdMovie',
+                    'Runtime',
+                    'Genre',
+                    'Director',
+                    'Actors',
+                    'Poster',
+                    'Plot',
+                ]
+            });
+            res.status(200).json({ movieAll });
+        } catch (error) {
+            res.status(500).json({
+                message: 'Erro interno do servidor',
+            });
+        }
+    }
+
 
 
 
