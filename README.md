@@ -5,9 +5,7 @@ disqus: hackmd
 
 Projetos API Filmes
 ===
-![downloads](https://img.shields.io/github/downloads/atom/atom/total.svg)
-![build](https://img.shields.io/appveyor/ci/:user/:repo.svg)
-![chat](https://img.shields.io/discord/:serverId.svg)
+
 
 ## Table of Contents
 
@@ -57,6 +55,9 @@ SECRET=asder145@45%67
 #API
 YOUR_API_KEY= "Criar Conta no OMDB"
 ```
+
+### Post Man 
+Esta no Projeto o postman com as rotas , filmesAPI.postman_collection.json
 
 
 
@@ -208,6 +209,283 @@ Por segurança depois a exclusão as informações de qual admin exclui e email 
 ![Alt text](public/Readme_files/image.png)
 
 
+### Criação de User padrão
+
+```gherkin=
+Feature: Criação User Padrão
+  # Usuário 
+  Regras : Um usuário padrão não tem acesso a todas as rotas.
+
+  Cenário: Não passa o nome 
+  Envia um mensagem de falha
+   - Não é passado o email 
+   Envia mensagem de falha 
+   - Email igual de outra usuário !
+   Envia mensagem para mudar 
+   - Senha em vazio 
+   Mensagem de Erro 
+   - Senha diferentes 
+   Mensagem de Erro 
+
+   Quando tiver passado Nome , Email e senha corretos e validados 
+   Criar novo Admin 
+   Passar token e userId .
+   isAdmin : true para front end 
+```
+#### Criação
+```gherkin=
+Mesmo padrão de verificação do Admin
+
+Passado : 
+{
+    "name": "fernando ",
+    "email": "fernando@gmail.com",
+    "password": "123456",
+    "confirmPassword": "123456"
+
+}
+Retorna :
+{
+    "message": "Você está autenticado",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiZmVybmFuZG8gIiwiaWQiOjMsImlhdCI6MTcwMjkzODU2Mn0.DthWea5OBg50P7uSvHBSXFovYoNymEbH69jGSsAqDbQ",
+    "userId": 3,
+    "isAdmin": false
+}
+```
+
+Print do Banco de dados mostrando que a senha está criptografadas e temos o isAdmin para diferenciar de um user admin .
+![Alt text](public/Readme_files/user_banco.png)
+
+
+### Quando user padrão se desativa
+
+```gherkin=
+O user padrão só pode se desativar , nunca desativar outro user padrão sem ser admin.
+
+Então o id pego pelo token .
+
+Rota : users/deactivation
+Onde é passado o Token
+retorna :
+{
+    "message": "Usuário atualizado com sucesso!"
+}
+```
+
+No Banco user o bit muda de status !
+
+![Alt text](public/Readme_files/user_bit.png)
+
+
+### Rota de Atualização de cadastro
+```gherkin=
+Rota : users/edit
+ - Mesma rota para todos user , id pego pelo TOKEN
+{
+    "name": "fabio",
+    "email": "fabiob@gmail.com",
+    "password" : "123456",
+    "confirmPassword": "123456"
+
+}
+Retorna :
+{
+    "message": "Usuário atualizado com sucesso!"
+}
+
+```
+
+Antes : 
+![Alt text](public/Readme_files/patch_antes.png)
+
+Depois: 
+![Alt text](public/Readme_files/patch_depois.png)
+
+
+### Rota para busca filme para cadastro 
+
+![Alt text](public/Readme_files/post_man_movie_busca.png)
+
+Depois e pelo o imdbId e repassado na rota movie/moviesById , para ver detalhes do filme
+
+
+```gherkin=
+Rota : movie/moviesById
+Passa :  idMovie 
+retorna: 
+{
+    "movies": {
+        "Title": "To End All War: Oppenheimer & the Atomic Bomb",
+        "Year": "2023",
+        "Rated": "N/A",
+        "Released": "10 Jul 2023",
+        "Runtime": "87 min",
+        "Genre": "Documentary",
+        "Director": "Christopher Cassel",
+        "Writer": "N/A",
+        "Actors": "J. Robert Oppenheimer, Kai Bird, Ellen Bradbury",
+        "Plot": "Exploring how one man's brilliance, hubris and relentless drive changed the nature of war forever.",
+        "Language": "English",
+        "Country": "United States",
+        "Awards": "N/A",
+        "Poster": "https://m.media-amazon.com/images/M/MV5BOTI1ZjI3MDctMzFmOC00NTZkLWI3ZjUtODMzNmI4MzM1NmRkXkEyXkFqcGdeQXVyNjQzMDEyOTI@._V1_SX300.jpg",
+        "Ratings": [
+            {
+                "Source": "Internet Movie Database",
+                "Value": "7.4/10"
+            }
+        ],
+        "Metascore": "N/A",
+        "imdbRating": "7.4",
+        "imdbVotes": "1,999",
+        "imdbID": "tt28240284",
+        "Type": "movie",
+        "DVD": "N/A",
+        "BoxOffice": "N/A",
+        "Production": "N/A",
+        "Website": "N/A",
+        "Response": "True"
+    }
+}
+```
+
+#### Rota de criação de filmes cadastrado no banco 
+
+```gherkin=
+Rota : movie/create
+Passa :  idMovie por Query
+retorna: 
+{
+    "createMovies": {
+        "id": 1,
+        "Title": "To End All War: Oppenheimer & the Atomic Bomb",
+        "IdMovie": "tt28240284",
+        "Runtime": "87 min",
+        "Genre": "Documentary",
+        "Director": "Christopher Cassel",
+        "Actors": "J. Robert Oppenheimer, Kai Bird, Ellen Bradbury",
+        "Poster": "https://m.media-amazon.com/images/M/MV5BOTI1ZjI3MDctMzFmOC00NTZkLWI3ZjUtODMzNmI4MzM1NmRkXkEyXkFqcGdeQXVyNjQzMDEyOTI@._V1_SX300.jpg",
+        "Plot": "Exploring how one man's brilliance, hubris and relentless drive changed the nature of war forever.",
+        "IdUser": "4",
+        "bit": true,
+        "updatedAt": "2023-12-18T23:15:11.911Z",
+        "createdAt": "2023-12-18T23:15:11.911Z"
+    }
+}
+```
+### Rota de votos 
+
+```gherkin=
+Rota :movie/createVote
+Passa :  
+{
+    "note": 4 ,
+    "IdMovie": 1
+}
+retorna: 
+{
+    "message": "Seu voto foi computado, Parabéns !"
+}
+
+
+CASO o user tentar fazer mais de uma voto :
+
+{
+    "message": "Só pode votar uma vez por Filme!"
+}
+
+CASO não tiver o id do filme :
+
+{
+    "message": "Filme não encontrado ! "
+}
+
+```
+
+#### Rota para trazer todos os filmes 
+
+```gherkin=
+Rota :movie/movieAll
+Passa :  
+{
+    "movieWithAverage": [
+        {
+            "id": 1,
+            "Title": "To End All War: Oppenheimer & the Atomic Bomb",
+            "IdMovie": "tt28240284",
+            "Runtime": "87 min",
+            "Genre": "Documentary",
+            "Director": "Christopher Cassel",
+            "Actors": "J. Robert Oppenheimer, Kai Bird, Ellen Bradbury",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BOTI1ZjI3MDctMzFmOC00NTZkLWI3ZjUtODMzNmI4MzM1NmRkXkEyXkFqcGdeQXVyNjQzMDEyOTI@._V1_SX300.jpg",
+            "Plot": "Exploring how one man's brilliance, hubris and relentless drive changed the nature of war forever.",
+            "AverageNote": {
+                "AverageNote": 4,
+                "votes": 1
+            }
+        },
+        {
+            "id": 2,
+            "Title": "The Panic in Needle Park",
+            "IdMovie": "tt0067549",
+            "Runtime": "110 min",
+            "Genre": "Drama",
+            "Director": "Jerry Schatzberg",
+            "Actors": "Al Pacino, Kitty Winn, Alan Vint",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BNmQ0YTg2ZGQtMmQ1My00ZThjLWEyM2UtNjlhNDE3MDdhNjhlXkEyXkFqcGdeQXVyMTUzMDUzNTI3._V1_SX300.jpg",
+            "Plot": "Follows the lives of heroin addicts who frequent \"Needle Park\" in New York City.",
+            "AverageNote": {
+                "AverageNote": 4,
+                "votes": 1
+            }
+        },
+        {
+            "id": 3,
+            "Title": "Panic",
+            "IdMovie": "tt10344410",
+            "Runtime": "N/A",
+            "Genre": "Adventure, Crime, Drama",
+            "Director": "N/A",
+            "Actors": "Olivia Scott Welch, Mike Faist, Jessica Sula",
+            "Poster": "https://m.media-amazon.com/images/M/MV5BODlhZjI4OTgtNzJmNS00NzBiLWE5ZWYtOTkxMGI1OTA5MzA4XkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg",
+            "Plot": "No one knows who invented Panic or when it first began. But in the forgotten rural town of Carp, Texas, the game is the only way out. Every summer the graduating seniors risk their lives competing in a series of challenges that fo...",
+            "AverageNote": {
+                "AverageNote": 4,
+                "votes": 1
+            }
+        }
+    ]
+}
+
+```
+
+### Rota para trazer um só filme 
+
+
+```gherkin=
+Rota : movie/getByIdMovie
+Passa :   por query o id
+{
+    "byMovie": {
+        "Title": "Panic",
+        "id": 3,
+        "IdMovie": "tt10344410",
+        "Runtime": "N/A",
+        "Genre": "Adventure, Crime, Drama",
+        "Director": "N/A",
+        "Actors": "Olivia Scott Welch, Mike Faist, Jessica Sula",
+        "Poster": "https://m.media-amazon.com/images/M/MV5BODlhZjI4OTgtNzJmNS00NzBiLWE5ZWYtOTkxMGI1OTA5MzA4XkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg",
+        "Plot": "No one knows who invented Panic or when it first began. But in the forgotten rural town of Carp, Texas, the game is the only way out. Every summer the graduating seniors risk their lives competing in a series of challenges that fo...",
+        "AverageNote": 4,
+        "VotesAmount": 1
+    }
+}
+
+```
+
+### 
+
+
 User flows
 ---
 ```sequence
@@ -216,8 +494,6 @@ Note right of Sistema: Sistema thinks
 Sistema-->Postman: Retorna !
 Note left of Postman: Postman responds
 ```
-
-> Read more about sequence-diagrams here: http://bramp.github.io/js-sequence-diagrams/
 
 Project Timeline
 ---
