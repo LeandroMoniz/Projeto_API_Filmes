@@ -157,9 +157,6 @@ module.exports = class MovieReviewController {
             });
 
             const moviesWithAverage = await Promise.all(movieAll.map(async (movie) => {
-                const votes = await Vote.findAll({
-                    where: { MovieId: movie.id },
-                });
                 const averageNote = await averageMovies(movie.id);
 
                 return {

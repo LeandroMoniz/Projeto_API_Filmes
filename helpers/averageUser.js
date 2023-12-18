@@ -1,10 +1,10 @@
 //models
 const Vote = require('../models/vote');
 //helpers
-const averageMovies = async (movieId) => {
+const averageUser = async (UserId) => {
     try {
         const votes = await Vote.findAll({
-            where: { MovieId: movieId },
+            where: { UserId: UserId },
         });
 
         if (votes.length === 0) {
@@ -27,4 +27,4 @@ const averageMovies = async (movieId) => {
 };
 
 
-module.exports = averageMovies; 
+module.exports = averageUser; 
