@@ -1,0 +1,407 @@
+{
+	"info": {
+		"_postman_id": "4bcaec09-67d7-4f02-bde2-cf632b01fd2d",
+		"name": "Filmes API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "17164051"
+	},
+	"item": [
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"fabio\",\r\n    \"email\": \"fabio@gmail.com\",\r\n    \"password\": \"111010\",\r\n    \"confirmPassword\": \"111010\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{URL}}users/registerAdmin"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"admin@admin.com\",\r\n    \"password\": \"123456\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{URL}}users/login"
+					},
+					"response": []
+				},
+				{
+					"name": "Check User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{URL}}users/checkUser"
+					},
+					"response": []
+				},
+				{
+					"name": "get by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{URL}}users/UserById"
+					},
+					"response": []
+				},
+				{
+					"name": "editar Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Danilo\",\r\n    \"email\": \"Souza@gmail.com\",\r\n    \"password\" : \"123456\",\r\n    \"confirmPassword\": \"123456\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{URL}}users/edit"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"admin\",\r\n    \"email\": \"admin@admin.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{URL}}users/removeUsers"
+					},
+					"response": []
+				},
+				{
+					"name": "desativar users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": "{{URL}}users/deactivation"
+					},
+					"response": []
+				},
+				{
+					"name": "All User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{URL}}users/allUser"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Usuários",
+			"item": [
+				{
+					"name": "post users",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"fernando \",\r\n    \"email\": \"fernando@gmail.com\",\r\n    \"password\": \"123456\",\r\n    \"confirmPassword\": \"123456\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{URL}}users/register"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Movies",
+			"item": [
+				{
+					"name": "getMovie",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}movie/movies?busca=panic",
+							"host": [
+								"{{URL}}movie"
+							],
+							"path": [
+								"movies"
+							],
+							"query": [
+								{
+									"key": "busca",
+									"value": "panic"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getbyidmovie",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}movie/moviesById?idMovie=tt28240284",
+							"host": [
+								"{{URL}}movie"
+							],
+							"path": [
+								"moviesById"
+							],
+							"query": [
+								{
+									"key": "idMovie",
+									"value": "tt28240284"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateMovie",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}movie/create?idMovie=tt3322314",
+							"host": [
+								"{{URL}}movie"
+							],
+							"path": [
+								"create"
+							],
+							"query": [
+								{
+									"key": "idMovie",
+									"value": "tt3322314"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filmes cadastrados",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{URL}}movie/movieAll"
+					},
+					"response": []
+				},
+				{
+					"name": "desativação",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}movie/deactivation?idMovie=tt3501632",
+							"host": [
+								"{{URL}}movie"
+							],
+							"path": [
+								"deactivation"
+							],
+							"query": [
+								{
+									"key": "idMovie",
+									"value": "tt3501632"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Busca ID filmes cadastrados",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}movie/getByIdMovie?id=3",
+							"host": [
+								"{{URL}}movie"
+							],
+							"path": [
+								"getByIdMovie"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Votos",
+			"item": [
+				{
+					"name": "cadastro de nota",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{TOKEN}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"note\": 4 ,\r\n    \"IdMovie\": 4\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{URL}}movie/createVote"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "http://localhost:5000/"
+		},
+		{
+			"key": "TOKEN",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiZmFiaW8iLCJpZCI6NCwiaWF0IjoxNzAyOTM5MzY2fQ.S1pcdVNg_9dD3OuBJyqJfJPrhypgmI7HVyXjmPNGXb4",
+			"type": "string"
+		}
+	]
+}
