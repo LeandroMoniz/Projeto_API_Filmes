@@ -1,13 +1,16 @@
+//models
 const User = require('../models/user');
 const Log = require('../models/log');
 
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 //helpers 
-const createUserToken = require('../helpers/create-user-token')
-const getToken = require('../helpers/get-token')
-const getUserByToken = require('../helpers/get-user-by-token')
+const createUserToken = require('../helpers/create-user-token');
+const getToken = require('../helpers/get-token');
+const getUserByToken = require('../helpers/get-user-by-token');
+const sendErrorResponse = require('../helpers/sendErrorResponse');
+//errorMessages
+const errorMessages = require('../public/errorMessages/errorMessages');
 module.exports = class UserController {
   static async registerAdmin(req, res) {
     const { name, email, password, confirmPassword } = req.body;
@@ -18,23 +21,9 @@ module.exports = class UserController {
     const user = await getUserByToken(token);
 
     if (user.isAdmin == false) {
-      res.status(422).json({
-        message: 'Usuário não autorizador !',
-      })
-      return
+      sendErrorResponse.fourTwoTwo(errorMessages.userNotAut, res);
+      return;
     }
-
-    const errorMessages = {
-      name: 'O nome é obrigatório',
-      email: 'O email é obrigatório',
-      password: 'A senha é obrigatória',
-      confirmPassword: 'A confirmação de senha é obrigatória',
-      passwordMatch: 'A senha e a confirmação de senha não são iguais!',
-    };
-
-    const sendErrorResponse = (message) => {
-      res.status(422).json({ message });
-    };
 
     const validations = {
       name,
@@ -45,18 +34,18 @@ module.exports = class UserController {
 
     for (const field in validations) {
       if (!validations[field]) {
-        sendErrorResponse(errorMessages[field]);
+        sendErrorResponse.fourTwoTwo(errorMessages[field], res);
         return;
       }
     }
 
     if (password.length < 6) {
-      sendErrorResponse('A senha deve ter no mínimo 6 caracteres.');
+      sendErrorResponse.fourTwoTwo(errorMessages.passwordInvalid, res);
       return;
     }
 
     if (password !== confirmPassword) {
-      sendErrorResponse(errorMessages.passwordMatch);
+      sendErrorResponse.fourTwoTwo(errorMessages.passwordMatch, res);
       return;
     }
 
@@ -66,8 +55,8 @@ module.exports = class UserController {
     const bit = true;
 
     // create a password
-    const salt = await bcrypt.genSalt(12)
-    const passwordHash = await bcrypt.hash(password, salt)
+    const salt = await bcrypt.genSalt(12);
+    const passwordHash = await bcrypt.hash(password, salt);
 
     if (userExists) {
       if (userExists.bit == false) {
@@ -83,18 +72,14 @@ module.exports = class UserController {
               where: { id: userExists.id }
             }
           );
-          res.status(422).json({
-            message: 'Cadastro reativado, atualizado dados e senha !',
-          });
+          sendErrorResponse.fourTwoTwo(errorMessages.regReactivate, res);
           return;
         } catch (error) {
           console.error(error);
-          res.status(500).json({ error: 'Internal Server Error' });
+          res.status(500).json({ error: 'Internal Server Error', res });
         }
       } else {
-        res.status(422).json({
-          message: 'Por favor, utilize outro e-mail',
-        });
+        sendErrorResponse.fourTwoTwo(errorMessages.emailOr, res);
         return;
       }
 
@@ -114,54 +99,48 @@ module.exports = class UserController {
   }
 
   static async login(req, res) {
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
     if (!email) {
-      res.status(422).json({ message: 'O e-mail é obrigatório' })
-      return
+      sendErrorResponse.fourTwoTwo(errorMessages.email, res);
+      return;
     }
 
     if (!password) {
-      res.status(422).json({ message: 'A senha é obrigatória' })
-      return
+      sendErrorResponse.fourTwoTwo(errorMessages.password, res);
+      return;
     }
 
     // check if user exists
-    const user = await User.findOne({ where: { email: email } })
+    const user = await User.findOne({ where: { email: email } });
 
     if (!user) {
-      res.status(422).json({
-        message: 'Não há usuário cadastrado com este e-mail!',
-      })
-      return
+      sendErrorResponse.fourTwoTwo(errorMessages.existingEmail, res);
+      return;
     }
-
+    console.log('aqui');
     if (user.bit == false) {
-      res.status(422).json({
-        message: 'Usuário desativado, fazer novo cadastro!',
-      })
-      return
+      sendErrorResponse.fourTwoTwo(errorMessages.desativeUser, res);
+      return;
     }
 
     // Check if password match with db password
-    const checkPassword = await bcrypt.compare(password, user.password)
+    const checkPassword = await bcrypt.compare(password, user.password);
 
     if (!checkPassword) {
-      res.status(422).json({
-        message: 'Senha inválida!',
-      })
-      return
+      sendErrorResponse.fourTwoTwo(errorMessages.invalidePassword, res);
+      return;
     }
 
-    await createUserToken(user, req, res)  //login
+    await createUserToken(user, req, res);
   }
 
   static async checkUser(req, res) {
-    let currentUser
+    let currentUser;
 
 
     if (req.headers.authorization) {
-      const token = getToken(req)
+      const token = getToken(req);
       try {
         const decoded = jwt.verify(token, process.env.SECRET);
 
@@ -175,14 +154,14 @@ module.exports = class UserController {
         currentUser = null;
       }
     } else {
-      currentUser = null
+      currentUser = null;
     }
 
-    res.status(200).send(currentUser)
+    res.status(200).send(currentUser);
   }
 
   static async getUserById(req, res) {
-    const id = req.params.id
+    const id = req.params.id;
 
     try {
       const user = await User.findByPk(id, {
@@ -190,10 +169,7 @@ module.exports = class UserController {
       });
 
       if (!user) {
-        res.status(422).json({
-          message: 'Usuário não encontrado!',
-        });
-        return;
+        sendErrorResponse.fourTwoTwo(errorMessages.notFound, res);
       }
 
       res.status(200).json({ user });
@@ -214,7 +190,7 @@ module.exports = class UserController {
 
     //validations
     if (!name || !email) {
-      res.status(422).json({ message: 'Nome e email são obrigatórios' });
+      sendErrorResponse.fourTwoTwo(errorMessages.requiredNameAnd, res);
       return;
     }
 
@@ -223,9 +199,7 @@ module.exports = class UserController {
       const userExists = await User.findOne({ where: { email: email } });
 
       if (userExists && user.id !== userExists.id) {
-        res.status(422).json({
-          message: 'Por favor, utilize outro e-mail!',
-        })
+        sendErrorResponse.fourTwoTwo(errorMessages.emailOr, res);
         return;
       }
 
@@ -234,26 +208,23 @@ module.exports = class UserController {
 
       // Password validation
       if (password.length < 6) {
-        sendErrorResponse('A senha deve ter no mínimo 6 caracteres.');
+        sendErrorResponse.fourTwoTwo(errorMessages.passwordInvalid, res);
         return;
       }
 
       if (password != confirmPassword) {
-        res.status(422).json({ message: 'As senhas não conferem!' })
-        return
+        sendErrorResponse.fourTwoTwo(errorMessages.passwordMatch, res);
+        return;
       } else if (password === confirmPassword && password != null) {
-        const salt = await bcrypt.genSalt(12)
-        const passwordHash = await bcrypt.hash(password, salt)
+        const salt = await bcrypt.genSalt(12);
+        const passwordHash = await bcrypt.hash(password, salt);
 
-        user.password = passwordHash
+        user.password = passwordHash;
       }
 
       // Saves changes to the database
       await user.save();
-
-      res.status(200).json({
-        message: 'Usuário atualizado com sucesso!',
-      });
+      sendErrorResponse.twoZero(errorMessages.userUpdate, res);
     } catch (error) {
       console.error('Erro ao atualizar usuário:', error);
       res.status(500).json({ message: 'Erro interno do servidor' });
@@ -265,19 +236,6 @@ module.exports = class UserController {
     const { name, email, password, confirmPassword } = req.body;
 
     // validations
-
-    const errorMessages = {
-      name: 'O nome é obrigatório',
-      email: 'O email é obrigatório',
-      password: 'A senha é obrigatória',
-      confirmPassword: 'A confirmação de senha é obrigatória',
-      passwordMatch: 'A senha e a confirmação de senha não são iguais!',
-    };
-
-    const sendErrorResponse = (message) => {
-      res.status(422).json({ message });
-    };
-
     const validations = {
       name,
       email,
@@ -287,18 +245,18 @@ module.exports = class UserController {
 
     for (const field in validations) {
       if (!validations[field]) {
-        sendErrorResponse(errorMessages[field]);
+        sendErrorResponse.fourTwoTwo(errorMessages[field], res);
         return;
       }
     }
 
     if (password.length < 6) {
-      sendErrorResponse('A senha deve ter no mínimo 6 caracteres.');
+      sendErrorResponse.fourTwoTwo(errorMessages.passwordInvalid, res);
       return;
     }
 
     if (password !== confirmPassword) {
-      sendErrorResponse(errorMessages.passwordMatch);
+      sendErrorResponse.fourTwoTwo(errorMessages.passwordMatch, res);
       return;
     }
 
@@ -309,8 +267,8 @@ module.exports = class UserController {
     const bit = true;
 
     // create a password
-    const salt = await bcrypt.genSalt(12)
-    const passwordHash = await bcrypt.hash(password, salt)
+    const salt = await bcrypt.genSalt(12);
+    const passwordHash = await bcrypt.hash(password, salt);
 
     if (userExists) {
       if (userExists.bit == false) {
@@ -327,18 +285,13 @@ module.exports = class UserController {
               where: { id: userExists.id }
             }
           );
-          res.status(422).json({
-            message: 'Cadastro reativado, atualizado dados e senha !',
-          });
-          return;
+          sendErrorResponse.twoZero(errorMessages.regReactivate, res);
         } catch (error) {
           console.error(error);
           res.status(500).json({ error: 'Internal Server Error' });
         }
       } else {
-        res.status(422).json({
-          message: 'Por favor, utilize outro e-mail',
-        });
+        sendErrorResponse.fourTwoTwo(errorMessages.emailOr, res);
         return;
       }
     } else {
@@ -358,33 +311,27 @@ module.exports = class UserController {
     const user = await getUserByToken(token);
 
     if (user.isAdmin == false) {
-      res.status(422).json({
-        message: 'Usuário não autorizador !',
-      })
-      return
+      sendErrorResponse.fourTwoTwo(errorMessages.userNotAut, res);
+      return;
     }
 
     const { name, email } = req.body;
 
     //validations
     if (!name || !email) {
-      res.status(422).json({ message: 'Nome e email são obrigatórios' });
+      sendErrorResponse.fourTwoTwo(errorMessages.requiredNameAnd, res);
       return;
     }
 
     const userExists = await User.findOne({ where: { email: email } });
 
     if (userExists == undefined) {
-      res.status(422).json({
-        message: 'Por favor, utilize outro e-mail!',
-      })
+      sendErrorResponse.fourTwoTwo(errorMessages.emailOr, res);
       return;
     }
 
     if (userExists.name != name) {
-      res.status(422).json({
-        message: 'Por favor, verifique o nome a ser removido!',
-      })
+      sendErrorResponse.fourTwoTwo(errorMessages.checkRemove, res);
       return;
     }
 
@@ -401,10 +348,7 @@ module.exports = class UserController {
       // Excluir o usuário
       await User.destroy({ where: { email } });
 
-      res.status(200).json({
-        message: 'Usuário removido com sucesso!',
-      });
-
+      sendErrorResponse.twoZero(errorMessages.userRemove, res);
     } catch (error) {
       console.error('Erro ao excluir usuário:', error);
       res.status(500).json({
@@ -419,13 +363,10 @@ module.exports = class UserController {
     const token = getToken(req);
     const user = await getUserByToken(token);
     //change of status
-    user.bit = false
+    user.bit = false;
     //save database
-    await user.save()
-    res.status(200).json({
-      message: 'Usuário atualizado com sucesso!',
-    });
-
+    await user.save();
+    sendErrorResponse.twoZero(errorMessages.userUpdate, res);
   }
 
 };
