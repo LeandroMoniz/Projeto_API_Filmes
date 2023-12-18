@@ -11,6 +11,7 @@ router.get('/moviesById', verifyToken, MovieReviewController.getByIdMovie);
 router.post('/create', verifyToken, MovieReviewController.createMovie);
 router.get('/movieAll', MovieReviewController.getMovieDb);
 router.patch('/deactivation', verifyToken, MovieReviewController.desativeMovie);
+router.get('/getByIdMovie', verifyToken, MovieReviewController.getByIdMovieDB);
 
 //vote
 router.post('/createVote', verifyToken, VoteController.createVote);

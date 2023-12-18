@@ -142,6 +142,7 @@ module.exports = class MovieReviewController {
             const movieAll = await Movie.findAll({
                 where: { bit: true },
                 attributes: [
+                    'id',
                     'Title',
                     'IdMovie',
                     'Runtime',
@@ -154,6 +155,40 @@ module.exports = class MovieReviewController {
 
             });
             res.status(200).json({ movieAll });
+        } catch (error) {
+            res.status(500).json({
+                message: 'Erro interno do servidor',
+            });
+        }
+    }
+
+
+    static async getByIdMovieDB(req, res) {
+        try {
+            const id = req.query.id
+            const movie = await Movie.findByPk(id)
+
+            if (movie == null || movie.bit == false) {
+                sendErrorResponse.fourTwoTwo(errorMessages.movieNot, res);
+                return;
+            } else {
+                const byMovie = {
+                    Title: movie.Title,
+                    id: movie.id,
+                    IdMovie: movie.IdMovie,
+                    Runtime: movie.Runtime,
+                    Genre: movie.Genre,
+                    Director: movie.Director,
+                    Actors: movie.Actors,
+                    Poster: movie.Poster,
+                    Plot: movie.Plot,
+                }
+
+                res.status(200).json({ byMovie });
+                return;
+            }
+
+
         } catch (error) {
             res.status(500).json({
                 message: 'Erro interno do servidor',

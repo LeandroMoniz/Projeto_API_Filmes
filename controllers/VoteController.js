@@ -27,7 +27,7 @@ module.exports = class VoteController {
             const movie = await Movie.findByPk(IdMovie);
             const user = await User.findByPk(IdUser);
 
-            if (!movie || movie == null) {
+            if (!movie || movie == null || movie.bit == false) {
                 sendErrorResponse.fourTwoTwo(errorMessages.movieNot, res);
                 return;
             }
@@ -55,6 +55,10 @@ module.exports = class VoteController {
                 message: 'Erro interno do servidor',
             });
         }
+
+    }
+
+    static async averageMovie(req, res) {
 
     }
 }
