@@ -120,6 +120,7 @@ module.exports = class MovieReviewController {
                     Poster: movies.Poster,
                     Plot: movies.Plot,
                     IdUser: user.id,
+                    bit: true,
                 }
 
                 const createMovies = await Movie.create(dbMovies);
@@ -139,6 +140,7 @@ module.exports = class MovieReviewController {
     static async getMovieDb(req, res) {
         try {
             const movieAll = await Movie.findAll({
+                where: { bit: true },
                 attributes: [
                     'Title',
                     'IdMovie',
@@ -148,7 +150,8 @@ module.exports = class MovieReviewController {
                     'Actors',
                     'Poster',
                     'Plot',
-                ]
+                ],
+
             });
             res.status(200).json({ movieAll });
         } catch (error) {
@@ -156,6 +159,30 @@ module.exports = class MovieReviewController {
                 message: 'Erro interno do servidor',
             });
         }
+    }
+
+    static async desativeMovie(req, res) {
+        const token = getToken(req);
+        const user = await getUserByToken(token);
+
+        if (user == null) {
+            sendErrorResponse.fourTwoTwo(errorMessages.userNotAut, res);
+            return;
+        }
+
+        if (user.isAdmin == false) {
+            sendErrorResponse.fourTwoTwo(errorMessages.userNotAut, res);
+            return;
+        }
+
+        const idMovie = req.query.idMovie;
+        const bit = false
+
+        await Movie.update({ bit: bit }, { where: { IdMovie: idMovie } });
+
+        sendErrorResponse.twoZero(errorMessages.MovieRemove, res);
+        return;
+
     }
 
 

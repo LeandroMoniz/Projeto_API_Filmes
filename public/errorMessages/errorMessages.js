@@ -17,7 +17,8 @@ const errorMessages = {
   userUpdate: 'Usuário atualizado com sucesso!',
   userRemove: 'Usuário removido com sucesso!',
   erroBusca: 'Não foi passado parâmetro obrigatório!',
-  movieExist: ' Filme já cadastrado ! '
+  movieExist: ' Filme já cadastrado ! ',
+  MovieRemove: 'Filme desativado!',
 };
 
 module.exports = errorMessages;

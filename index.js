@@ -48,7 +48,8 @@ app.use('/users', UserRoutes);
 app.use('/movie', MovieRoutes);
 
 
-conn.sync()
+conn
+  .sync()
   //.sync({ force: true })
   .then(async () => {
     // Função para criar o primeiro administrador se não existir

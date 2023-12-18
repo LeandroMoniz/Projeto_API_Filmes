@@ -20,6 +20,11 @@ module.exports = class UserController {
     const token = getToken(req);
     const user = await getUserByToken(token);
 
+    if (user == null) {
+      sendErrorResponse.fourTwoTwo(errorMessages.userNotAut, res);
+      return;
+    }
+
     if (user.isAdmin == false) {
       sendErrorResponse.fourTwoTwo(errorMessages.userNotAut, res);
       return;
