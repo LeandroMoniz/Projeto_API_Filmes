@@ -10,6 +10,8 @@ const Log = require('./models/log');
 const Movie = require('./models/movie');
 const Vote = require('./models/vote');
 
+const models = [User, Log, Movie, Vote];
+
 const app = express();
 // Config JSON response
 app.use(express.json());
@@ -54,6 +56,9 @@ conn
   .sync()
   //.sync({ force: true })
   .then(async () => {
+    for (const model of models) {
+      await model.sync();
+    }
     // Função para criar o primeiro administrador se não existir
     await createFirstAdmin();
 

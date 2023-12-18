@@ -5,10 +5,10 @@ const User = require('./user');
 const Movie = require('./movie');
 
 const Vote = sequelize.define('Vote', {
-    Note: {
-        type: DataTypes.INTEGER,
-        require: true,
-    },
+  Note: {
+    type: DataTypes.INTEGER,
+    require: true,
+  },
 
 });
 
