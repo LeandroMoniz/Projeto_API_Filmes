@@ -177,8 +177,9 @@ module.exports = class MovieReviewController {
 
         const idMovie = req.query.idMovie;
         const bit = false
+        console.log("id", user.id)
 
-        await Movie.update({ bit: bit }, { where: { IdMovie: idMovie } });
+        await Movie.update({ bit: bit, IdUser: user.id }, { where: { IdMovie: idMovie } });
 
         sendErrorResponse.twoZero(errorMessages.MovieRemove, res);
         return;

@@ -10,7 +10,7 @@ router.get('/movies', verifyToken, MovieReviewController.getMovie);
 router.get('/moviesById', verifyToken, MovieReviewController.getByIdMovie);
 router.post('/create', verifyToken, MovieReviewController.createMovie);
 router.get('/movieAll', MovieReviewController.getMovieDb);
-router.get('/deactivation', verifyToken, MovieReviewController.desativeMovie);
+router.patch('/deactivation', verifyToken, MovieReviewController.desativeMovie);
 
 
 module.exports = router;
